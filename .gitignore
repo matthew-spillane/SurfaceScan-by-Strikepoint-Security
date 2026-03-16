@@ -1,1 +1,7 @@
-node_modules/\ndist/\n__pycache__/\n*.pyc\n.env\n*.egg-info/\n.vite/\n
+node_modules/
+dist/
+__pycache__/
+*.pyc
+.env
+*.egg-info/
+.vite/
