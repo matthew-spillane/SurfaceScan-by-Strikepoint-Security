@@ -299,6 +299,7 @@ def _build_graph(domain: str, assets: list[Asset]) -> GraphData:
     nodes: list[GraphNode] = []
     edges: list[GraphEdge] = []
     seen_nodes: set[str] = set()
+    seen_edges: set[tuple[str, str]] = set()
 
     # Root domain node
     domain_id = f"domain:{domain}"
@@ -356,8 +357,10 @@ def _build_graph(domain: str, assets: list[Asset]) -> GraphData:
                 )
                 seen_nodes.add(ip_id)
 
-            # Edge: subdomain → IP
+            # Edge: subdomain → IP (deduplicated)
             edge_key = (sub_id, ip_id)
-            edges.append(GraphEdge(source=sub_id, target=ip_id))
+            if edge_key not in seen_edges:
+                seen_edges.add(edge_key)
+                edges.append(GraphEdge(source=sub_id, target=ip_id))
 
     return GraphData(nodes=nodes, edges=edges)
