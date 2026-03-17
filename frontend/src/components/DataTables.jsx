@@ -10,7 +10,7 @@ export default function DataTables({ assets }) {
   const [activeTab, setActiveTab] = useState('ASSETS');
 
   return (
-    <div className="flex flex-col h-[38vh] min-h-0" style={{ borderTop: '1px solid #30363d', background: '#0d1117' }}>
+    <div className="flex flex-col h-[32vh] min-h-0" style={{ borderTop: '1px solid #30363d', background: '#0d1117' }}>
       {/* Tab bar */}
       <div className="flex shrink-0" style={{ borderBottom: '1px solid #21262d', background: '#161b22' }}>
         {TABS.map((tab) => (
