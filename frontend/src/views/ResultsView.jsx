@@ -64,45 +64,48 @@ export default function ResultsView({ scanId, domain, onBack }) {
       <TopBar scan={scan} domain={domain} onBack={onBack} />
       <MetricsStrip summary={scan?.summary} />
 
-      {/* Main three-column layout */}
-      <div className="flex h-[52vh] shrink-0">
-        {/* Left — Asset Navigator */}
-        <div className="shrink-0 overflow-hidden flex flex-col"
-          style={{ width: '20%', borderRight: '1px solid #30363d' }}>
-          <AssetNavigator
-            assets={scan?.assets || []}
-            selectedAsset={selectedAsset}
-            onSelect={handleAssetClick}
-          />
+      {/* Main content area — fills remaining space */}
+      <div className="flex-1 flex flex-col min-h-0">
+        {/* Main three-column layout */}
+        <div className="flex h-[52vh] shrink-0">
+          {/* Left — Asset Navigator */}
+          <div className="shrink-0 overflow-hidden flex flex-col"
+            style={{ width: '20%', borderRight: '1px solid #30363d' }}>
+            <AssetNavigator
+              assets={scan?.assets || []}
+              selectedAsset={selectedAsset}
+              onSelect={handleAssetClick}
+            />
+          </div>
+
+          {/* Center — Graph or Console */}
+          <div className="flex-1 min-w-0 relative overflow-hidden"
+            style={{ background: '#0d1117' }}>
+            {showConsole && (
+              <ScanConsole
+                log={scan?.log || []}
+                done={scan?.status === 'complete'}
+              />
+            )}
+            {!showConsole && scan && (
+              <NetworkGraph
+                graph={scan.graph}
+                selectedNode={selectedNode}
+                onNodeClick={handleNodeClick}
+              />
+            )}
+          </div>
+
+          {/* Right — Asset Detail */}
+          <div className="shrink-0 overflow-y-auto"
+            style={{ width: '25%', borderLeft: '1px solid #30363d' }}>
+            <AssetDetail asset={selectedAsset} summary={scan?.summary} />
+          </div>
         </div>
 
-        {/* Center — Graph or Console */}
-        <div className="flex-1 min-w-0 relative overflow-hidden"
-          style={{ background: '#0d1117' }}>
-          {showConsole && (
-            <ScanConsole
-              log={scan?.log || []}
-              done={scan?.status === 'complete'}
-            />
-          )}
-          {!showConsole && scan && (
-            <NetworkGraph
-              graph={scan.graph}
-              selectedNode={selectedNode}
-              onNodeClick={handleNodeClick}
-            />
-          )}
-        </div>
-
-        {/* Right — Asset Detail */}
-        <div className="shrink-0 overflow-y-auto"
-          style={{ width: '25%', borderLeft: '1px solid #30363d' }}>
-          <AssetDetail asset={selectedAsset} summary={scan?.summary} />
-        </div>
+        {/* Bottom — Data Tables */}
+        <DataTables assets={scan?.assets || []} />
       </div>
-
-      {/* Bottom — Data Tables */}
-      <DataTables assets={scan?.assets || []} />
     </div>
   );
 }
