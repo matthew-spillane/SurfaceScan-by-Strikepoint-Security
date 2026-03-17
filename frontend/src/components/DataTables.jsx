@@ -3,8 +3,9 @@ import AssetsTable from './AssetsTable';
 import PortsTable from './PortsTable';
 import TechnologiesTable from './TechnologiesTable';
 import CertificatesTable from './CertificatesTable';
+import MapView from './MapView';
 
-const TABS = ['ASSETS', 'PORTS', 'TECHNOLOGIES', 'CERTIFICATES'];
+const TABS = ['ASSETS', 'PORTS', 'TECHNOLOGIES', 'CERTIFICATES', 'MAP'];
 
 export default function DataTables({ assets }) {
   const [activeTab, setActiveTab] = useState('ASSETS');
@@ -35,6 +36,7 @@ export default function DataTables({ assets }) {
         {activeTab === 'PORTS' && <PortsTable assets={assets} />}
         {activeTab === 'TECHNOLOGIES' && <TechnologiesTable assets={assets} />}
         {activeTab === 'CERTIFICATES' && <CertificatesTable assets={assets} />}
+        {activeTab === 'MAP' && <MapView assets={assets} />}
       </div>
     </div>
   );
