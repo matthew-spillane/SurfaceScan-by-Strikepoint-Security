@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useCallback } from 'react';
 import * as d3 from 'd3';
 
 const RISK_COLORS = {
@@ -23,8 +23,16 @@ export default function NetworkGraph({ graph, selectedNode, onNodeClick }) {
   const svgRef = useRef(null);
   const containerRef = useRef(null);
   const simRef = useRef(null);
+  const nodeSelRef = useRef(null);
+  const onNodeClickRef = useRef(onNodeClick);
   const [tooltip, setTooltip] = useState(null);
 
+  // Keep click callback ref current without triggering re-renders
+  useEffect(() => {
+    onNodeClickRef.current = onNodeClick;
+  }, [onNodeClick]);
+
+  // Build simulation — only when graph data changes
   useEffect(() => {
     if (!graph || !graph.nodes || graph.nodes.length === 0) return;
     if (!containerRef.current) return;
@@ -118,6 +126,9 @@ export default function NetworkGraph({ graph, selectedNode, onNodeClick }) {
         })
       );
 
+    // Store node selection for use in the selection-styling effect
+    nodeSelRef.current = node;
+
     // Node circles
     node.append('circle')
       .attr('r', d => NODE_RADIUS[d.type])
@@ -126,8 +137,6 @@ export default function NetworkGraph({ graph, selectedNode, onNodeClick }) {
         if (d.type === 'ip') return NODE_COLOR.ip;
         return RISK_COLORS[d.risk_level] || '#8b949e';
       })
-      .attr('stroke', d => selectedNode === d.id ? '#ffffff' : 'none')
-      .attr('stroke-width', d => selectedNode === d.id ? 2 : 0)
       .attr('opacity', 0.9);
 
     // Labels for domain nodes
@@ -140,10 +149,10 @@ export default function NetworkGraph({ graph, selectedNode, onNodeClick }) {
       .attr('font-family', "'SF Mono', 'Cascadia Code', 'Fira Code', Consolas, monospace")
       .attr('font-size', '11px');
 
-    // Click handler
+    // Click handler — only updates React state, no simulation changes
     node.on('click', (event, d) => {
       event.stopPropagation();
-      onNodeClick(d.id);
+      onNodeClickRef.current(d.id);
     });
 
     // Tooltip handlers
@@ -166,7 +175,7 @@ export default function NetworkGraph({ graph, selectedNode, onNodeClick }) {
     .on('mouseleave', () => setTooltip(null));
 
     // Deselect on background click
-    svg.on('click', () => onNodeClick(null));
+    svg.on('click', () => onNodeClickRef.current(null));
 
     // Tick
     sim.on('tick', () => {
@@ -178,10 +187,24 @@ export default function NetworkGraph({ graph, selectedNode, onNodeClick }) {
       node.attr('transform', d => `translate(${d.x},${d.y})`);
     });
 
+    // Freeze simulation once it settles
+    sim.on('end', () => {
+      sim.stop();
+    });
+
     return () => {
       sim.stop();
+      nodeSelRef.current = null;
     };
-  }, [graph, selectedNode, onNodeClick]);
+  }, [graph]);
+
+  // Update selection styling — no simulation involvement
+  useEffect(() => {
+    if (!nodeSelRef.current) return;
+    nodeSelRef.current.select('circle')
+      .attr('stroke', d => selectedNode === d.id ? '#ffffff' : 'none')
+      .attr('stroke-width', d => selectedNode === d.id ? 2 : 0);
+  }, [selectedNode]);
 
   return (
     <div ref={containerRef} className="w-full h-full relative"
