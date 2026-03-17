@@ -10,9 +10,9 @@ export default function DataTables({ assets }) {
   const [activeTab, setActiveTab] = useState('ASSETS');
 
   return (
-    <div style={{ borderTop: '1px solid #30363d', background: '#0d1117' }}>
+    <div className="flex flex-col h-[45vh] min-h-0" style={{ borderTop: '1px solid #30363d', background: '#0d1117' }}>
       {/* Tab bar */}
-      <div className="flex" style={{ borderBottom: '1px solid #21262d', background: '#161b22' }}>
+      <div className="flex shrink-0" style={{ borderBottom: '1px solid #21262d', background: '#161b22' }}>
         {TABS.map((tab) => (
           <button
             key={tab}
@@ -30,7 +30,7 @@ export default function DataTables({ assets }) {
       </div>
 
       {/* Table content */}
-      <div style={{ maxHeight: '320px', overflowY: 'auto' }}>
+      <div className="flex-1 overflow-y-auto min-h-0">
         {activeTab === 'ASSETS' && <AssetsTable assets={assets} />}
         {activeTab === 'PORTS' && <PortsTable assets={assets} />}
         {activeTab === 'TECHNOLOGIES' && <TechnologiesTable assets={assets} />}

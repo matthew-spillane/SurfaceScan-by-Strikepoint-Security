@@ -42,7 +42,7 @@ export default function AssetNavigator({ assets, selectedAsset, onSelect }) {
             <div
               key={asset.subdomain}
               onClick={() => onSelect(asset)}
-              className="flex items-center gap-2 px-3 py-1.5 cursor-pointer"
+              className="flex items-center gap-2 px-3 py-0.5 cursor-pointer"
               style={{
                 background: isSelected ? '#161b22' : 'transparent',
                 borderLeft: isSelected

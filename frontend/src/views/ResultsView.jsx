@@ -60,12 +60,12 @@ export default function ResultsView({ scanId, domain, onBack }) {
   const showConsole = isRunning;
 
   return (
-    <div className="min-h-screen flex flex-col" style={{ background: '#0d1117' }}>
+    <div className="h-screen flex flex-col overflow-hidden" style={{ background: '#0d1117' }}>
       <TopBar scan={scan} domain={domain} onBack={onBack} />
       <MetricsStrip summary={scan?.summary} />
 
       {/* Main three-column layout */}
-      <div className="flex flex-1 min-h-0" style={{ height: 'calc(100vh - 148px)' }}>
+      <div className="flex h-[45vh] shrink-0">
         {/* Left — Asset Navigator */}
         <div className="shrink-0 overflow-hidden flex flex-col"
           style={{ width: '20%', borderRight: '1px solid #30363d' }}>
