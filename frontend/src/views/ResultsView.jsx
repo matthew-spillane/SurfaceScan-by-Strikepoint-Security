@@ -65,7 +65,7 @@ export default function ResultsView({ scanId, domain, onBack }) {
       <MetricsStrip summary={scan?.summary} />
 
       {/* Main three-column layout */}
-      <div className="flex h-[45vh] shrink-0">
+      <div className="flex h-[52vh] shrink-0">
         {/* Left — Asset Navigator */}
         <div className="shrink-0 overflow-hidden flex flex-col"
           style={{ width: '20%', borderRight: '1px solid #30363d' }}>
