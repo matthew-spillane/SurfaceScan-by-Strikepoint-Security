@@ -1,10 +1,16 @@
 import { useState } from 'react';
 import { startScan } from '../api/client';
+import { useAuth } from '../contexts/AuthContext';
+import ScanHistory from '../components/ScanHistory';
+
+const TABS = ['SCAN', 'HISTORY'];
 
 export default function SearchView({ onScanStarted }) {
+  const { session } = useAuth();
   const [domain, setDomain] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [activeTab, setActiveTab] = useState('SCAN');
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -13,7 +19,7 @@ export default function SearchView({ onScanStarted }) {
     setLoading(true);
     setError('');
     try {
-      const res = await startScan(d);
+      const res = await startScan(d, session?.access_token);
       onScanStarted(res.scan_id, res.domain);
     } catch (err) {
       setError(err.message);
@@ -43,52 +49,81 @@ export default function SearchView({ onScanStarted }) {
         </p>
       </div>
 
-      {/* Search form */}
-      <form onSubmit={handleSubmit} className="w-full" style={{ maxWidth: '680px' }}>
-        <div className="flex items-center gap-0 rounded-sm overflow-hidden"
-          style={{ border: '1px solid #30363d', background: '#0d1117' }}>
-          <span className="font-mono text-sm pl-4 shrink-0 select-none"
-            style={{ color: '#3fb950' }}>
-            scan&gt;
-          </span>
-          <input
-            type="text"
-            value={domain}
-            onChange={(e) => setDomain(e.target.value)}
-            placeholder="example.com"
-            spellCheck={false}
-            autoFocus
-            className="flex-1 font-mono text-base py-3 px-3 outline-none"
-            style={{
-              background: 'transparent',
-              color: '#e6edf3',
-              border: 'none',
-            }}
-          />
+      {/* Tab bar */}
+      <div className="flex mb-6" style={{ maxWidth: '680px', width: '100%', borderBottom: '1px solid #21262d' }}>
+        {TABS.map((tab) => (
           <button
-            type="submit"
-            disabled={loading || !domain.trim()}
-            className="font-mono text-xs tracking-widest uppercase px-6 py-3 shrink-0 cursor-pointer"
+            key={tab}
+            onClick={() => setActiveTab(tab)}
+            className="font-mono text-xs pb-2 px-4 tracking-widest"
             style={{
-              background: loading ? '#21262d' : '#161b22',
-              color: loading ? '#484f58' : '#58a6ff',
+              color: activeTab === tab ? '#e6edf3' : '#484f58',
+              borderBottom: activeTab === tab ? '2px solid #58a6ff' : '2px solid transparent',
+              marginBottom: '-1px',
+              background: 'transparent',
               border: 'none',
-              borderLeft: '1px solid #30363d',
-            }}>
-            {loading ? 'INITIATING...' : 'SCAN'}
+              borderBottom: activeTab === tab ? '2px solid #58a6ff' : '2px solid transparent',
+              cursor: 'pointer',
+            }}
+          >
+            {tab}
           </button>
-        </div>
-        {error && (
-          <p className="font-mono text-xs mt-2" style={{ color: '#f85149' }}>
-            {error}
-          </p>
-        )}
-      </form>
+        ))}
+      </div>
 
-      {/* Hint text */}
-      <p className="font-mono text-xs mt-6" style={{ color: '#484f58' }}>
-        Enter a root domain to begin attack surface discovery
-      </p>
+      {activeTab === 'SCAN' && (
+        <>
+          {/* Search form */}
+          <form onSubmit={handleSubmit} className="w-full" style={{ maxWidth: '680px' }}>
+            <div className="flex items-center gap-0 rounded-sm overflow-hidden"
+              style={{ border: '1px solid #30363d', background: '#0d1117' }}>
+              <span className="font-mono text-sm pl-4 shrink-0 select-none"
+                style={{ color: '#3fb950' }}>
+                scan&gt;
+              </span>
+              <input
+                type="text"
+                value={domain}
+                onChange={(e) => setDomain(e.target.value)}
+                placeholder="example.com"
+                spellCheck={false}
+                autoFocus
+                className="flex-1 font-mono text-base py-3 px-3 outline-none"
+                style={{
+                  background: 'transparent',
+                  color: '#e6edf3',
+                  border: 'none',
+                }}
+              />
+              <button
+                type="submit"
+                disabled={loading || !domain.trim()}
+                className="font-mono text-xs tracking-widest uppercase px-6 py-3 shrink-0 cursor-pointer"
+                style={{
+                  background: loading ? '#21262d' : '#161b22',
+                  color: loading ? '#484f58' : '#58a6ff',
+                  border: 'none',
+                  borderLeft: '1px solid #30363d',
+                }}>
+                {loading ? 'INITIATING...' : 'SCAN'}
+              </button>
+            </div>
+            {error && (
+              <p className="font-mono text-xs mt-2" style={{ color: '#f85149' }}>
+                {error}
+              </p>
+            )}
+          </form>
+
+          <p className="font-mono text-xs mt-6" style={{ color: '#484f58' }}>
+            Enter a root domain to begin attack surface discovery
+          </p>
+        </>
+      )}
+
+      {activeTab === 'HISTORY' && (
+        <ScanHistory onLoadScan={null} />
+      )}
     </div>
   );
 }

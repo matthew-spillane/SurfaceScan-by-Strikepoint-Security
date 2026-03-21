@@ -1,9 +1,11 @@
 const API_BASE = import.meta.env.VITE_API_URL || '';
 
-export async function startScan(domain) {
+export async function startScan(domain, accessToken) {
+  const headers = { 'Content-Type': 'application/json' };
+  if (accessToken) headers['Authorization'] = `Bearer ${accessToken}`;
   const res = await fetch(`${API_BASE}/api/scan`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers,
     body: JSON.stringify({ domain }),
   });
   if (!res.ok) {
@@ -22,5 +24,21 @@ export async function getScan(scanId) {
 export async function getScanGraph(scanId) {
   const res = await fetch(`${API_BASE}/api/scan/${scanId}/graph`);
   if (!res.ok) throw new Error('Failed to fetch graph');
+  return res.json();
+}
+
+export async function getScanHistory(accessToken) {
+  const res = await fetch(`${API_BASE}/api/scans/history`, {
+    headers: { Authorization: `Bearer ${accessToken}` },
+  });
+  if (!res.ok) throw new Error('Failed to fetch scan history');
+  return res.json();
+}
+
+export async function getScanFromDB(scanId, accessToken) {
+  const res = await fetch(`${API_BASE}/api/scans/${scanId}`, {
+    headers: { Authorization: `Bearer ${accessToken}` },
+  });
+  if (!res.ok) throw new Error('Failed to fetch scan');
   return res.json();
 }
