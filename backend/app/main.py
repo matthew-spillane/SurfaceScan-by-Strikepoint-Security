@@ -35,3 +35,13 @@ app.include_router(scan_router, prefix="/api", tags=["scan"])
 async def health():
     """Health check endpoint for Railway."""
     return {"status": "ok", "service": "surfacescan"}
+
+
+@app.get("/debug/env")
+async def debug_env():
+    import os
+    return {
+        "SUPABASE_URL": "set" if os.environ.get("SUPABASE_URL") else "MISSING",
+        "SUPABASE_SERVICE_ROLE_KEY": "set" if os.environ.get("SUPABASE_SERVICE_ROLE_KEY") else "MISSING",
+        "SUPABASE_JWT_SECRET": "set" if os.environ.get("SUPABASE_JWT_SECRET") else "MISSING",
+    }
