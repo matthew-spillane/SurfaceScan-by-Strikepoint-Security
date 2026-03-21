@@ -19,6 +19,7 @@ export function AuthProvider({ children }) {
       (_event, session) => {
         setSession(session)
         setUser(session?.user ?? null)
+        setLoading(false)
       }
     )
 
