@@ -13,16 +13,6 @@ function GoogleIcon() {
   )
 }
 
-function MicrosoftIcon() {
-  return (
-    <svg width="16" height="16" viewBox="0 0 21 21" xmlns="http://www.w3.org/2000/svg">
-      <rect x="1" y="1" width="9" height="9" fill="#F25022"/>
-      <rect x="11" y="1" width="9" height="9" fill="#7FBA00"/>
-      <rect x="1" y="11" width="9" height="9" fill="#00A4EF"/>
-      <rect x="11" y="11" width="9" height="9" fill="#FFB900"/>
-    </svg>
-  )
-}
 
 export default function AuthModal({ onClose }) {
   const { signIn, signUp } = useAuth()
@@ -60,7 +50,7 @@ export default function AuthModal({ onClose }) {
     try {
       const { error } = await supabase.auth.signInWithOAuth({
         provider,
-        options: { redirectTo: window.location.origin },
+        options: { redirectTo: 'https://surfacescan.strikepointsec.com' },
       })
       if (error) throw error
     } catch (err) {
@@ -80,7 +70,6 @@ export default function AuthModal({ onClose }) {
         style={{
           background: '#0d1117',
           border: '1px solid #30363d',
-          boxShadow: '0 0 0 1px #21262d, 0 32px 80px rgba(0,0,0,0.8)',
         }}
       >
         {/* Close */}
@@ -197,7 +186,7 @@ export default function AuthModal({ onClose }) {
         <div className="flex items-center gap-3 my-5">
           <div style={{ flex: 1, height: '1px', background: '#21262d' }} />
           <span className="font-mono text-xs" style={{ color: '#484f58', letterSpacing: '0.1em' }}>
-            OR CONTINUE WITH
+            OR
           </span>
           <div style={{ flex: 1, height: '1px', background: '#21262d' }} />
         </div>
@@ -220,21 +209,7 @@ export default function AuthModal({ onClose }) {
             {oauthLoading === 'google' ? 'REDIRECTING…' : 'CONTINUE WITH GOOGLE'}
           </button>
 
-          <button
-            onClick={() => handleOAuth('azure')}
-            disabled={!!oauthLoading}
-            className="font-mono flex items-center justify-center gap-3 w-full py-2 text-xs tracking-widest uppercase"
-            style={{
-              background: '#0d1117',
-              border: '1px solid #30363d',
-              color: oauthLoading === 'azure' ? '#484f58' : '#8b949e',
-              cursor: oauthLoading ? 'not-allowed' : 'pointer',
-              opacity: oauthLoading && oauthLoading !== 'azure' ? 0.5 : 1,
-            }}
-          >
-            <MicrosoftIcon />
-            {oauthLoading === 'azure' ? 'REDIRECTING…' : 'CONTINUE WITH MICROSOFT'}
-          </button>
+
         </div>
       </div>
     </div>
