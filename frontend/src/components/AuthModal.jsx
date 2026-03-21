@@ -50,7 +50,7 @@ export default function AuthModal({ onClose }) {
     try {
       const { error } = await supabase.auth.signInWithOAuth({
         provider,
-        options: { redirectTo: 'https://surfacescan.strikepointsec.com' },
+        options: { redirectTo: window.location.origin, skipBrowserRedirect: false },
       })
       if (error) throw error
     } catch (err) {
