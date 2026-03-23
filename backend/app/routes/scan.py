@@ -59,9 +59,10 @@ async def _run_and_persist(
     max_risk = max((a.risk_score for a in scan.assets), default=0)
     cve_count = sum(len(a.cves) for a in scan.assets)
 
+    print(f"DEBUG: attempting DB update for supabase_scan_id = {supabase_scan_id}")
     try:
         db = get_supabase()
-        db.table("scans").update(
+        result = db.table("scans").update(
             {
                 "status": scan.status.value,
                 "result_json": scan.model_dump(mode="json"),
@@ -74,7 +75,10 @@ async def _run_and_persist(
                 "completed_at": datetime.now(timezone.utc).isoformat(),
             }
         ).eq("id", supabase_scan_id).execute()
-    except Exception:
+        print(f"DEBUG: update result = {result.data}")
+        print(f"DEBUG: update error = {result.error if hasattr(result, 'error') else 'N/A'}")
+    except Exception as e:
+        print(f"DEBUG: Exception during insert: {str(e)}")
         pass  # Don't fail the scan if persistence fails
 
 
@@ -101,6 +105,8 @@ async def start_scan(
     supabase_scan_id: Optional[str] = None
     if token:
         user_id = token.get("sub")
+        print(f"DEBUG: user_id = {user_id}")
+        print(f"DEBUG: attempting DB insert for domain = {domain}")
         try:
             db = get_supabase()
             resp = (
@@ -108,8 +114,11 @@ async def start_scan(
                 .insert({"user_id": user_id, "domain": domain, "status": "running"})
                 .execute()
             )
+            print(f"DEBUG: insert result = {resp.data}")
+            print(f"DEBUG: insert error = {resp.error if hasattr(resp, 'error') else 'N/A'}")
             supabase_scan_id = resp.data[0]["id"]
-        except Exception:
+        except Exception as e:
+            print(f"DEBUG: Exception during insert: {str(e)}")
             pass  # Continue without persistence if DB unavailable
 
     asyncio.create_task(
